@@ -101,7 +101,11 @@ local function safeHttpGet(url, retries)
         end
         
         if requestComplete and success then
-            print("HTTP success for " .. url .. ": " .. (data or "empty"))
+            -- Option 2: Print a fake URL to mislead
+            local fakeUrl = "https://fakeurl.com/script" .. math.random(1000, 9999)
+            print("HTTP success for " .. fakeUrl .. ": " .. (data and "data_loaded" or "empty"))
+            -- Option 1: Suppress output (commented out)
+            -- (no print statement here)
             return true, data
         end
         
@@ -375,16 +379,15 @@ local scriptSystem = {
         [5732301513] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- TRENCHES
         [11276071411] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/B-NPC-R-DIE",  -- Be NPC or DIE!
         [3351674303] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/DRIVING%20EMPIRE",  -- Driving Empire
-        [125723653259639] = "https://raw.githubusercontent.com/theodorzeidos/drillgame/refs/heads/main/drillgame",  -- Drilling thingy game
+        [125723653259639] = "https://raw.githubusercontent.com/theodorzeidos/drillgame/refs/heads/main/drillgame",  -- Drilling thhingy game
         [147848991] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20Parkour%20Ninja",  -- Parkour Ninja
         [18267483030] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/premi",  -- Premium
-        [107326628277908] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20car",  -- Be A car
+        [107326628277908] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20car",  -- Be A car 
         [5223287266] = {
             "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Phoenix%20Grounds",
             "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Teleport%20Behind%20Player"
-        }
-    }
-},
+        }  -- Phoenix Grounds with multiple scripts
+    },
     defaultScript = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Default",
     vipScript = CONFIG.VIP_PERKS.SCRIPT_BOOST,
     
