@@ -627,7 +627,7 @@ KeyTab:CreateButton({
 
 KeyTab:CreateParagraph({
     Title = "📢 Credits",
-    Content = "Script by COMBO_WICK & Bang.E.Line\nVersion: " .. CONFIG.VERSION .. "\nAccess: " .. accessControl:getStatus(LocalPlayer.UserId) .. "\nEnjoy the Vault!"
+    Content = "Script by COMBO_WICK & Star\nVersion: " .. CONFIG.VERSION .. "\nAccess: " .. accessControl:getStatus(LocalPlayer.UserId) .. "\nEnjoy the Vault!"
 })
 
 -- Responses Tab
