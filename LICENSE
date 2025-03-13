@@ -380,6 +380,7 @@ local scriptSystem = {
         [94590879393563] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/HM42",  -- Weird Gun Game
         [11276071411] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/B-NPC-R-DIE",  -- Be NPC or DIE!
         [3351674303] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/DRIVING%20EMPIRE",  -- Driving Empire
+        [73010525850196] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/dv22",  -- Desert Detectors
         [125723653259639] = "https://raw.githubusercontent.com/theodorzeidos/drillgame/refs/heads/main/drillgame",  -- Drilling thhingy game
         [147848991] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20Parkour%20Ninja",  -- Parkour Ninja
         [18267483030] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/premi",  -- Premium
