@@ -1,0 +1,362 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+    Name = "ComboChronicle Vault | Updates Might Come",
+    Icon = 12345678901, --  diamond icon ID? 
+    LoadingTitle = "Loading ComboChronicle Vault ❖",
+    LoadingSubtitle = "By COMBO_WICK | Bang.E.Line",
+    Theme = "Ocean"
+})
+
+-- Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Local Player
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+
+-- ESP Setup
+local Drawing = Drawing or getgenv().Drawing
+if not Drawing then
+    warn("Drawing library not found. ESP will be disabled.")
+end
+
+local function createESP(part)
+    if not Drawing then return end
+    local billboard = Instance.new("BillboardGui", part)
+    billboard.Name = "ESP"
+    billboard.AlwaysOnTop = true
+    billboard.Size = UDim2.new(0, 100, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+
+    local text = Instance.new("TextLabel", billboard)
+    text.Size = UDim2.new(1, 0, 1, 0)
+    text.BackgroundTransparency = 1
+    text.Text = part.Name
+    text.TextColor3 = Color3.fromRGB(255, 0, 0)
+    text.TextStrokeTransparency = 0
+    text.Font = Enum.Font.GothamBold
+    text.TextSize = 14
+end
+
+-- ESP for Cactuses, Loot, and Other Items
+local espTrackedFolders = {"Cactuses", "Loot"}
+local function updateESP()
+    for _, folderName in pairs(espTrackedFolders) do
+        local folder = Workspace:FindFirstChild(folderName)
+        if folder then
+            for _, item in pairs(folder:GetChildren()) do
+                if not item:FindFirstChild("ESP") then
+                    createESP(item)
+                end
+            end
+        end
+    end
+
+    -- Search for additional loot paths
+    local potentialLootPaths = {"Treasures", "Items", "Rewards", "Submarine", "Tanks", "Crates", "Artifacts"}
+    for _, path in pairs(potentialLootPaths) do
+        local lootFolder = Workspace:FindFirstChild(path)
+        if lootFolder and not table.find(espTrackedFolders, path) then
+            table.insert(espTrackedFolders, path)
+            for _, item in pairs(lootFolder:GetChildren()) do
+                if not item:FindFirstChild("ESP") then
+                    createESP(item)
+                end
+            end
+        end
+    end
+end
+
+-- Core Enhancement Logic (Disguised Crate Exploit)
+local function enhanceRewards()
+    while boostRewardsEnabled do
+        -- Internal optimization (actually purchasing legendary crates)
+        local _a = {-999} -- Quantity adjustment
+        for _ = 1, 2 do -- Execute twice for maximum efficiency
+            ReplicatedStorage:WaitForChild("Purchase_Legendary_Crate"):FireServer(unpack(_a))
+        end
+
+        -- Process inventory (sell everything)
+        ReplicatedStorage:WaitForChild("Sell_Inventory"):FireServer()
+        wait(2) -- Cooldown for anti-cheat safety
+    end
+end
+
+-- Auto-Sell Inventory
+local function autoSellInventory()
+    while autoSellEnabled do
+        ReplicatedStorage:WaitForChild("Sell_Inventory"):FireServer()
+        wait(2) -- Sell every 2 seconds to avoid spamming
+    end
+end
+
+-- Digging Automation
+local function digAtPosition(position)
+    ReplicatedStorage:WaitForChild("Dig"):FireServer({[1] = position})
+    ReplicatedStorage:WaitForChild("Change_Mode"):FireServer({[1] = "Dig Down"})
+    ReplicatedStorage:WaitForChild("Change_Power"):FireServer({[1] = 1.4587907242774953})
+end
+
+local function autoDig()
+    while autoDigEnabled do
+        local lootFolders = {"Cactuses", "Loot"}
+        for _, folderName in pairs(lootFolders) do
+            local folder = Workspace:FindFirstChild(folderName)
+            if folder then
+                for _, item in pairs(folder:GetChildren()) do
+                    if item:IsA("BasePart") then
+                        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
+                        local tween = TweenService:Create(HumanoidRootPart, tweenInfo, {Position = item.Position + Vector3.new(0, 5, 0)})
+                        tween:Play()
+                        tween.Completed:Wait()
+
+                        digAtPosition(item.Position)
+                        wait(0.2)
+                    end
+                end
+            end
+        end
+        wait(1)
+    end
+end
+
+-- Teleport to Best Shovel/Detector
+local function teleportToBestGear()
+    if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-711.273681640625, 75.92625427246094, 396.4830322265625)
+        print("Teleported to best shovel/detector!")
+    else
+        print("Character not found! Unable to teleport.")
+    end
+end
+
+-- Fly Script
+local flying = false
+local flySpeed = 50
+local bodyVelocity = nil
+local bodyGyro = nil
+
+local function startFlying()
+    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+    local rootPart = LocalPlayer.Character.HumanoidRootPart
+    local humanoid = LocalPlayer.Character.Humanoid
+
+    -- Disable gravity
+    humanoid.PlatformStand = true
+
+    -- Create BodyVelocity for movement
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = rootPart
+
+    -- Create BodyGyro for orientation
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.CFrame = rootPart.CFrame
+    bodyGyro.Parent = rootPart
+
+    -- Movement loop
+    RunService.RenderStepped:Connect(function()
+        if not flying then return end
+        local camera = Workspace.CurrentCamera
+        local moveDirection = Vector3.new(0, 0, 0)
+
+        -- WASD movement
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            moveDirection = moveDirection + (camera.CFrame.LookVector * Vector3.new(1, 0, 1))
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            moveDirection = moveDirection - (camera.CFrame.LookVector * Vector3.new(1, 0, 1))
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            moveDirection = moveDirection - (camera.CFrame.RightVector * Vector3.new(1, 0, 1))
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            moveDirection = moveDirection + (camera.CFrame.RightVector * Vector3.new(1, 0, 1))
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            moveDirection = moveDirection + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+            moveDirection = moveDirection - Vector3.new(0, 1, 0)
+        end
+
+        -- Normalize and apply speed
+        if moveDirection.Magnitude > 0 then
+            moveDirection = moveDirection.Unit * flySpeed
+        end
+        bodyVelocity.Velocity = moveDirection
+        bodyGyro.CFrame = camera.CFrame
+    end)
+end
+
+local function stopFlying()
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
+    end
+    if bodyGyro then
+        bodyGyro:Destroy()
+        bodyGyro = nil
+    end
+    if LocalPlayer.Character then
+        LocalPlayer.Character.Humanoid.PlatformStand = false
+    end
+end
+
+-- Toggle Fly with 'F' Key
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.F and flyEnabled then
+        flying = not flying
+        if flying then
+            startFlying()
+            print("Flying enabled! Use WASD, Space to ascend, Left Ctrl to descend.")
+        else
+            stopFlying()
+            print("Flying disabled!")
+        end
+    end
+end)
+
+-- Main Tab
+local MainTab = Window:CreateTab("Main", 12345678)
+
+MainTab:CreateToggle({
+    Name = "INF MONEY",
+    CurrentValue = false,
+    Info = "INF MONEY",
+    Callback = function(value)
+        boostRewardsEnabled = value
+        if value then
+            spawn(enhanceRewards)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Dig",
+    CurrentValue = false,
+    Callback = function(value)
+        autoDigEnabled = value
+        if value then
+            spawn(autoDig)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Sell Inventory",
+    CurrentValue = false,
+    Callback = function(value)
+        autoSellEnabled = value
+        if value then
+            spawn(autoSellInventory)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "ESP",
+    CurrentValue = false,
+    Callback = function(value)
+        espEnabled = value
+        if value then
+            RunService.RenderStepped:Connect(updateESP)
+        end
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Teleport to Best Shovel/Detector",
+    Callback = function()
+        teleportToBestGear()
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Speed Boost",
+    Range = {16, 500},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Callback = function(value)
+        Humanoid.WalkSpeed = value
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Callback = function(value)
+        infiniteJumpEnabled = value
+    end
+})
+
+-- Fixed Infinite Jump Logic
+local infiniteJumpEnabled = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Space and infiniteJumpEnabled then
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+MainTab:CreateToggle({
+    Name = "Fly (Press F to Toggle)",
+    CurrentValue = false,
+    Callback = function(value)
+        flyEnabled = value
+        if not value and flying then
+            flying = false
+            stopFlying()
+            print("Flying disabled!")
+        end
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Fly Speed",
+    Range = {10, 200},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 50,
+    Callback = function(value)
+        flySpeed = value
+    end
+})
+
+-- Credits Tab
+local CreditsTab = Window:CreateTab("✨ Credits", "info")
+local CreatorSection = CreditsTab:CreateSection("👑 Creator")
+CreditsTab:CreateLabel("🛠️ COMBO_WICK - Discord: world_star_hacker")
+local CoDevSection = CreditsTab:CreateSection("🤝 Co-Developer")
+CreditsTab:CreateLabel("💡 None - Discord: None")
+local DiscordSection = CreditsTab:CreateSection("🌐 Discord Server")
+CreditsTab:CreateLabel("🔗 Join our server: discord.com/invite/mwTHaCKzhw")
+CreditsTab:CreateButton({
+   Name = "📋 Copy Discord Link/Youtube",
+   Callback = function()
+      local links = "Discord: discord.com/invite/mwTHaCKzhw\nYouTube: https://www.youtube.com/@COMBO_WICK"
+      setclipboard(links)
+   end,
+})
+
+-- Initial Setup
+local boostRewardsEnabled = false
+local autoDigEnabled = false
+local autoSellEnabled = false
+local espEnabled = false
+local flyEnabled = false
+
+print("BOOM BANG BADA BOOM")
