@@ -330,52 +330,57 @@ local webhookSystem = {
     end
 }
 
--- Script loader
 local scriptSystem = {
     scripts = {
-        [18209375211] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/FireTouchIntrest%20Universal",  -- Game 1
-        [14518422161] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Hitbox%20Gunfight%20Arena",  -- Game 2
-        [155615604] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Prison%20Life",  -- Game 3
-        [76455837887178] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Dig%20it(Auto-Dig%20%2B%20more%20coming)",  -- Game 4
-        [7920018625] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Nuke%20Tycoon%20Nuclear",  -- Game 5
-        [15694891095] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/TheOneV1",  -- Game 6
-        [106266102947071] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- DAY OF INFAMY D-DAY
-        [15948669967] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- TNB Shootout in Baixada Brazil
-        [77074973013032] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Zamora, Michoacan
-        [17333357466] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Nuevo Laredo, Tamaulipas
-        [8233004585] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Syrian Shenanigans [B1]
-        [11638805019] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Colombia
-        [15599178512] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- West Chicago
-        [16291041162] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Zeus FPS - Troca de Tiro RJ
-        [84000476186267] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Brecha 9 Rio Bravo [NEW MAP]
-        [9679014784] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Afghanistan
-        [18365888493] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Nogales-Mexico-Actualizacion
-        [16168039994] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- TNP - Shootout in Penha Brazil
-        [3678761576] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ENTRENCHED_WW1",  -- ENTRENCHED WW1
-        [8735521924] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- CENTAURA
-        [6654918151] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Trench War
-        [17209126270] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- Rancheria, Nuevo Leon
-        [5732301513] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",  -- TRENCHES
-        [94590879393563] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/HM42",  -- Weird Gun Game
-        [11276071411] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/B-NPC-R-DIE",  -- Be NPC or DIE!
-        [3351674303] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/DRIVING%20EMPIRE",  -- Driving Empire
-        [73010525850196] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/dv22",  -- Desert Detectors
-        [85832836496852] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/DEAD",  -- Dead SAIL
-        [125723653259639] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/drilling",  -- Drilling thhingy game
-        [9865958871] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/new",  -- BIG Paintball 2
-        [147848991] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20Parkour%20Ninja",  -- Parkour Ninja
-        [18267483030] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/premi",  -- Premium
-        [107326628277908] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20car",  -- Be A car 
+        [18209375211] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/FireTouchIntrest%20Universal",
+        [14518422161] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Hitbox%20Gunfight%20Arena",
+        [155615604] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Prison%20Life",
+        [76455837887178] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Dig%20it(Auto-Dig%20%2B%20more%20coming)",
+        [7920018625] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Nuke%20Tycoon%20Nuclear",
+        [15694891095] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/TheOneV1",
+        [106266102947071] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [15948669967] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [77074973013032] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [17333357466] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [8233004585] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [11638805019] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [15599178512] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [16291041162] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [84000476186267] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [9679014784] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [18365888493] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [16168039994] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [3678761576] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ENTRENCHED_WW1",
+        [8735521924] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [6654918151] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [17209126270] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [5732301513] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/ALL",
+        [94590879393563] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/HM42",
+        [11276071411] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/B-NPC-R-DIE",
+        [3351674303] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/DRIVING%20EMPIRE",
+        [73010525850196] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/dv22",
+        [85832836496852] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/DEAD",
+        [125723653259639] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/drilling",
+        [9865958871] = "https://raw.githubusercontent.com/12345678kanhai/silence/refs/heads/main/new",
+        [147848991] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20Parkour%20Ninja",
+        [18267483030] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/premi",
+        [107326628277908] = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Be%20A%20car",
         [5223287266] = {
             "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Phoenix%20Grounds",
             "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Teleport%20Behind%20Player"
-        }  -- Phoenix Grounds with multiple scripts
+        }
     },
     defaultScript = "https://raw.githubusercontent.com/checkurasshole/Script/refs/heads/main/Default",
     vipScript = CONFIG.VIP_PERKS.SCRIPT_BOOST,
     
     getScriptForGame = function(self, gameId)
-        return self.scripts[gameId] or self.defaultScript
+        local script = self.scripts[gameId]
+        if script then
+            return script
+        else
+            Rayfield:Notify({Title = "Warning", Content = "No script found for this game. Loading default script.", Duration = 5})
+            return self.defaultScript
+        end
     end,
     
     loadScript = function(self, scriptUrl, notifyOnLoad)
