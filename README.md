@@ -26,7 +26,7 @@ Read the full license here 👉 [LICENSE.md](./LICENSE.md)
 For serious inquiries:
 - Discord: `world_star_hacker`
 - GitHub: [Combo_Wick](eeeeeee)
-- Email: Wil be available soon *(burner recommended)*
+- Email: Wil be available soon
 
 ---
 
